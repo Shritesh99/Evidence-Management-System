@@ -1,0 +1,17 @@
+{
+    "name": "Evidence-Management-System",
+    "version": "1.0.0",
+    "main": "src/index.js",
+    "repository": "https://github.com/Shritesh99/Evidence-Management-System.git",
+    "scripts": {
+        "start": "node src/index.js",
+        "dev": "nodemon src/index.js",
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "author": "Shritesh99 <shritesh.sj@gmail.com>",
+    "license": "MIT",
+    "dependencies": {
+        "protobufjs": "^6.10.1",
+        "sawtooth-sdk": "^1.0.5"
+    }
+}
