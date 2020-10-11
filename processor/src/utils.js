@@ -4,8 +4,8 @@ const { createHash } = require("crypto");
 
 const FAMILY = "Evidence_Management_System";
 const TYPES = {
-    EVIDENCE: "evidence",
-    PERSON: "person",
+    EVIDENCE: "EVIDENCE",
+    PERSON: "PERSON",
 };
 
 const NAMESPACE_BASE_LENGTH = 6;

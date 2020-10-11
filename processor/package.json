@@ -11,6 +11,7 @@
     "author": "Shritesh99 <shritesh.sj@gmail.com>",
     "license": "MIT",
     "dependencies": {
+        "google-protobuf": "^3.13.0",
         "protobufjs": "^6.10.1",
         "sawtooth-sdk": "^1.0.5"
     }

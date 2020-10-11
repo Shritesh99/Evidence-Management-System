@@ -6,30 +6,48 @@ const { InvalidTransaction } = require("sawtooth-sdk/processor/exceptions");
 const { TransactionHeader } = require("sawtooth-sdk/protobuf");
 
 const UTILS = require("./utils");
+const EMSState = require("./state");
+const EMSPayload = require("./payload");
+
+const SYNC_TOLERANCE = 5 * 60 * 1000; // 5 min tolerance
 
 class EMSHandler extends TransactionHandler {
-    constructor() {
-        console.log("Initializing JSON handler for Transfer-Chain");
-        super(UTILS.FAMILY, "0.0", [UTILS.NAMESPACE]);
-    }
+	constructor() {
+		console.log("Initializing JSON handler for Evidence_Management_System");
+		super(UTILS.FAMILY, "0.0", [UTILS.NAMESPACE]);
+	}
 
-    apply(txn, state) {
-        // Parse the transaction header and payload
-        const header = TransactionHeader.decode(txn.header);
-        const signer = header.signerPubkey;
-        // const { action, asset, owner } = JSON.parse(txn.payload);
+	apply(txn, context) {
+		// Parse the transaction header and payload
+		const header = TransactionHeader.decode(txn.header);
+		const signer = header.signerPublicKey;
+		const payload = new EMSPayload(txn.payload);
+		const state = new EMSState(context);
 
-        // Design payload
-        // if (action === "create") return createAsset(asset, signer, state);
-        // if (action === "transfer")
-        //     return transferAsset(asset, owner, signer, state);
-        // if (action === "accept") return acceptTransfer(asset, signer, state);
-        // if (action === "reject") return rejectTransfer(asset, signer, state);
+		validateTimestamp(payload.getTimestamp());
 
-        return Promise.resolve().then(() => {
-            throw new InvalidTransaction("Action must be in Payload");
-        });
-    }
+		if (payload.getAction() === "CREATE_EVIDENCE")
+			createEvidence(signer, state, payload);
+		if (payload.getAction() === "CREATE_PERSON")
+			createPerson(signer, state, payload);
+
+		return Promise.resolve().then(() => {
+			throw new InvalidTransaction("Invalid payload");
+		});
+	}
+	createEvidence(signer, state, payload) {
+		// TODO: Validate
+	}
+	createPerson(signer, state, payload) {
+		// TODO: Validate
+	}
+	validateTimestamp(timestamp) {
+		const current_time = Date.getTime();
+		if (current_time - timestamp < SYNC_TOLERANCE)
+			throw new InvalidTransaction(
+				"Timestamp must be less than local time."
+			);
+	}
 }
 
 module.exports = EMSHandler;
