@@ -20,15 +20,11 @@ class EMSPayload {
 	}
 	getData() {
 		if (
-			this.payload.action === "CREATE_EVIDENCE" &&
-			this.payload.create_evidence
+			(this.payload.action === "CREATE_EVIDENCE" ||
+				this.payload.action === "CREATE_PERSON") &&
+			this.payload.data
 		)
-			return this.payload.create_evidence;
-		else if (
-			this.payload.action === "CREATE_PERSON" &&
-			this.payload.create_person
-		)
-			return this.payload.create_person;
+			return this.payload.data;
 		else throw new InvalidTransaction("Action does not match payload data");
 	}
 }

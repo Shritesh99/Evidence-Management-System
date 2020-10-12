@@ -2,7 +2,7 @@
 
 const { createHash } = require("crypto");
 
-const FAMILY = "Evidence_Management_System";
+const FAMILY = "evidence_management_system";
 const TYPES = {
     EVIDENCE: "EVIDENCE",
     PERSON: "PERSON",
@@ -22,11 +22,11 @@ const getAddress = (key, length = NAMESPACE_PREFIX_OFFSET_LENGTH) =>
 
 const NAMESPACE = getAddress(FAMILY, NAMESPACE_BASE_LENGTH);
 
-const getEvidenceAddress = (name) =>
-    PREFIX + EVIDENCE_PREFIX.EVIDENCE_PREFIX + getAddress(name, NAMESPACE_OFFSET_LENGTH);
+const getEvidenceAddress = (key) =>
+    PREFIX + EVIDENCE_PREFIX.EVIDENCE_PREFIX + getAddress(key, NAMESPACE_OFFSET_LENGTH);
 
-const getPersonAddress = (asset) =>
-    PREFIX + TYPE_PREFIXES.PERSON_PREFIX + getAddress(asset, NAMESPACE_OFFSET_LENGTH);
+const getPersonAddress = (key) =>
+    PREFIX + TYPE_PREFIXES.PERSON_PREFIX + getAddress(key, NAMESPACE_OFFSET_LENGTH);
 
 const getType = (address) =>
     address.slice(NAMESPACE_BASE_LENGTH + 1, NAMESPACE_BASE_LENGTH + 3) ==

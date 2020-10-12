@@ -1,6 +1,5 @@
 "use strict";
 
-const { createHash } = require("crypto");
 const { TransactionHandler } = require("sawtooth-sdk/processor/handler");
 const { InvalidTransaction } = require("sawtooth-sdk/processor/exceptions");
 const { TransactionHeader } = require("sawtooth-sdk/protobuf");
@@ -9,11 +8,11 @@ const UTILS = require("./utils");
 const EMSState = require("./state");
 const EMSPayload = require("./payload");
 
-const SYNC_TOLERANCE = 5 * 60 * 1000; // 5 min tolerance
+const SYNC_TOLERANCE = 5 * 60 * 1000; // 5 min sync tolerance
 
 class EMSHandler extends TransactionHandler {
 	constructor() {
-		console.log("Initializing JSON handler for Evidence_Management_System");
+		console.log("Initializing EMS handler for Evidence Management System");
 		super(UTILS.FAMILY, "0.0", [UTILS.NAMESPACE]);
 	}
 
@@ -35,11 +34,25 @@ class EMSHandler extends TransactionHandler {
 			throw new InvalidTransaction("Invalid payload");
 		});
 	}
+
 	createEvidence(signer, state, payload) {
-		// TODO: Validate
+		return state.getPerson(signer).then((person) => {
+			if (!person)
+				throw new InvalidTransaction(
+					`Person with the public key ${signer} does not exists`
+				);
+			return state.createEvidence(signer, person, payload.data);
+		});
 	}
+
 	createPerson(signer, state, payload) {
-		// TODO: Validate
+		return state.getPerson(signer).then((person) => {
+			if (person)
+				throw new InvalidTransaction(
+					`Person with the public key ${signer} already exists`
+				);
+			return state.createPerson(signer, payload.data);
+		});
 	}
 	validateTimestamp(timestamp) {
 		const current_time = Date.getTime();
