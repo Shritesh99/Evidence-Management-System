@@ -3,8 +3,8 @@
 const { createHash } = require("crypto");
 
 // Constants
-const FAMILY = process.env.REACT_APP_FAMILY_NAME;
-const FAMILY_VERSION = process.env.REACT_APP_FAMILY_VERSION;
+const FAMILY = process.env.FAMILY_NAME || "evidence_management_system";
+const FAMILY_VERSION = process.env.FAMILY_VERSION || "0.0";
 
 const TYPES = {
 	EVIDENCE: "EVIDENCE",

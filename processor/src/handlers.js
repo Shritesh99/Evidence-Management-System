@@ -15,7 +15,7 @@ class EMSHandler extends TransactionHandler {
 		console.log(
 			"Initializing EMS handler for Evidence Management System"
 		);
-		super(Utils.FAMILY, "0.0", [Utils.NAMESPACE]);
+		super(Utils.FAMILY, Utils.FAMILY_VERSION, [Utils.NAMESPACE]);
 	}
 
 	apply(txn, context) {

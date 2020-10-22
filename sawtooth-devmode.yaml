@@ -18,6 +18,20 @@ services:
           depends_on:
                - validator
           entrypoint: "xo-tp-python -vv -C tcp://validator:4004"
+     processor:
+          image: processor
+          container_name: processor
+          build: ./processor
+          volumes:
+               - ./processor:/processor
+               - /processor/node_modules
+          depends_on:
+               - validator
+          environment:
+               - VALIDATOR_URL=tcp://validator:4004
+               - FAMILY_NAME=evidence_management_system
+               - FAMILY_VERSION=0.0
+
      validator:
           image: "hyperledger/sawtooth-validator:chime"
           container_name: sawtooth-validator-default
