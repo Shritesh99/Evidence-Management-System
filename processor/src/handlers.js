@@ -4,7 +4,7 @@ const { TransactionHandler } = require("sawtooth-sdk/processor/handler");
 const { InvalidTransaction } = require("sawtooth-sdk/processor/exceptions");
 const { TransactionHeader } = require("sawtooth-sdk/protobuf");
 
-const UTILS = require("./utils");
+const Utils = require("./utils");
 const EMSState = require("./state");
 const EMSPayload = require("./payload");
 
@@ -12,8 +12,10 @@ const SYNC_TOLERANCE = 5 * 60 * 1000; // 5 min sync tolerance
 
 class EMSHandler extends TransactionHandler {
 	constructor() {
-		console.log("Initializing EMS handler for Evidence Management System");
-		super(UTILS.FAMILY, "0.0", [UTILS.NAMESPACE]);
+		console.log(
+			"Initializing EMS handler for Evidence Management System"
+		);
+		super(Utils.FAMILY, "0.0", [Utils.NAMESPACE]);
 	}
 
 	apply(txn, context) {
@@ -21,7 +23,7 @@ class EMSHandler extends TransactionHandler {
 		const header = TransactionHeader.decode(txn.header);
 		const signer = header.signerPublicKey;
 		const payload = new EMSPayload(txn.payload);
-		const state = new EMSState(context);
+		const state = new EMSState(context, payload.getTimestamp());
 
 		validateTimestamp(payload.getTimestamp());
 
