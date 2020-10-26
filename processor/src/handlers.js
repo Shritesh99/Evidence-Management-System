@@ -2,7 +2,6 @@
 
 const { TransactionHandler } = require("sawtooth-sdk/processor/handler");
 const { InvalidTransaction } = require("sawtooth-sdk/processor/exceptions");
-const { TransactionHeader } = require("sawtooth-sdk/protobuf");
 
 const Utils = require("./utils");
 const EMSState = require("./state");
@@ -15,22 +14,22 @@ class EMSHandler extends TransactionHandler {
 		console.log(
 			"Initializing EMS handler for Evidence Management System"
 		);
-		super(Utils.FAMILY, Utils.FAMILY_VERSION, [Utils.NAMESPACE]);
+		super(Utils.FAMILY, [Utils.FAMILY_VERSION], [Utils.NAMESPACE]);
 	}
 
 	apply(txn, context) {
 		// Parse the transaction header and payload
-		const header = TransactionHeader.decode(txn.header);
+		const header = txn.header;
 		const signer = header.signerPublicKey;
 		const payload = new EMSPayload(txn.payload);
 		const state = new EMSState(context, payload.getTimestamp());
 
-		validateTimestamp(payload.getTimestamp());
+		this.validateTimestamp(payload.getTimestamp());
 
 		if (payload.getAction() === "CREATE_EVIDENCE")
-			createEvidence(signer, state, payload);
+			this.createEvidence(signer, state, payload);
 		if (payload.getAction() === "CREATE_PERSON")
-			createPerson(signer, state, payload);
+			this.createPerson(signer, state, payload);
 
 		return Promise.resolve().then(() => {
 			throw new InvalidTransaction("Invalid payload");
@@ -57,8 +56,8 @@ class EMSHandler extends TransactionHandler {
 		});
 	}
 	validateTimestamp(timestamp) {
-		const current_time = Date.getTime();
-		if (current_time - timestamp < SYNC_TOLERANCE)
+		const current_time = Date.now();
+		if (current_time - timestamp > SYNC_TOLERANCE)
 			throw new InvalidTransaction(
 				"Timestamp must be less than local time."
 			);

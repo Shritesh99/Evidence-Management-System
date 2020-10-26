@@ -19,8 +19,7 @@ const TYPE_PREFIXES = {
 	PERSON_PREFIX: "01",
 };
 // Encoding Decoding helpers
-const encode = (obj) =>
-	Buffer.from(JSON.stringify(obj, Object.keys(obj).sort()));
+const encode = (obj) => Buffer.from(JSON.stringify(obj));
 
 const decode = (buf) => JSON.parse(buf.toString());
 

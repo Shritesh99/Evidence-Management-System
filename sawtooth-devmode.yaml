@@ -2,65 +2,77 @@ version: "2.1"
 services:
      settings-tp:
           image: "hyperledger/sawtooth-settings-tp:chime"
-          container_name: sawtooth-settings-tp-default
+          container_name: ems-settings-tp
           depends_on:
                - validator
-          entrypoint: "settings-tp -vv -C tcp://validator:4004"
-     intkey-tp-python:
-          image: "hyperledger/sawtooth-intkey-tp-python:chime"
-          container_name: sawtooth-intkey-tp-python-default
-          depends_on:
-               - validator
-          entrypoint: "intkey-tp-python -vv -C tcp://validator:4004"
-     xo-tp-python:
-          image: "hyperledger/sawtooth-xo-tp-python:chime"
-          container_name: sawtooth-xo-tp-python-default
-          depends_on:
-               - validator
-          entrypoint: "xo-tp-python -vv -C tcp://validator:4004"
-     processor:
-          image: processor
-          container_name: processor
-          build: ./processor
-          volumes:
-               - ./processor:/processor
-               - /processor/node_modules
-          depends_on:
-               - validator
-          environment:
-               - VALIDATOR_URL=tcp://validator:4004
-               - FAMILY_NAME=evidence_management_system
-               - FAMILY_VERSION=0.0
+          entrypoint: "settings-tp -v -C tcp://validator:4004"
+
+     # processor:
+     #      image: processor
+     #      container_name: ems-processor
+     #      build: ./processor
+     #      volumes:
+     #           - ./processor:/processor
+     #           - /processor/node_modules
+     #      depends_on:
+     #           - validator
+     #      environment:
+     #           - VALIDATOR_URL=tcp://validator:4004
+     #           - FAMILY_NAME=evidence_management_system
+     #           - FAMILY_VERSION=0.0
 
      validator:
           image: "hyperledger/sawtooth-validator:chime"
-          container_name: sawtooth-validator-default
+          container_name: ems-validator
           expose:
                - 4004
           ports:
                - "4004:4004"
           entrypoint: >-
-               bash -c "sawadm keygen && sawtooth keygen my_key && sawset genesis -k /root/.sawtooth/keys/my_key.priv && sawset proposal create -k /root/.sawtooth/keys/my_key.priv sawtooth.consensus.algorithm.name=Devmode
-               sawtooth.consensus.algorithm.version=0.1 -o config.batch && sawadm genesis config-genesis.batch config.batch && sawtooth-validator -vv --endpoint tcp://validator:8800 --bind component:tcp://eth0:4004 --bind network:tcp://eth0:8800
-               --bind consensus:tcp://eth0:5050 "
+               bash -c "
+                    if [ ! -f /etc/sawtooth/keys/validator.priv ]; then
+                         sawadm keygen &&
+                         sawtooth keygen my_key &&
+                         sawset genesis -k /root/.sawtooth/keys/my_key.priv &&
+                         sawset proposal create -k /root/.sawtooth/keys/my_key.priv sawtooth.consensus.algorithm.name=Devmode sawtooth.consensus.algorithm.version=0.1 -o config.batch && 
+                         sawadm genesis config-genesis.batch config.batch
+                    fi;
+                    sawtooth-validator -v --endpoint tcp://validator:8800 --bind component:tcp://eth0:4004 --bind network:tcp://eth0:8800 --bind consensus:tcp://eth0:5050
+                    "
+
      devmode-engine:
           image: "hyperledger/sawtooth-devmode-engine-rust:chime"
-          container_name: sawtooth-devmode-engine-rust-default
+          container_name: ems-devmode-engine
           depends_on:
                - validator
-          entrypoint: "devmode-engine-rust -C tcp://validator:5050"
+          entrypoint: "devmode-engine-rust -C tcp://validator:5050 -v"
+
      rest-api:
           image: "hyperledger/sawtooth-rest-api:chime"
-          container_name: sawtooth-rest-api-default
+          container_name: ems-rest-api
           ports:
                - "8008:8008"
           depends_on:
                - validator
-          entrypoint: "sawtooth-rest-api -C tcp://validator:4004 --bind rest-api:8008"
+          entrypoint: "sawtooth-rest-api -C tcp://validator:4004 --bind rest-api:8008 -v"
           environment: []
-     shell:
-          image: "hyperledger/sawtooth-shell:chime"
-          container_name: sawtooth-shell-default
+
+     rest-api-proxy:
+          build: ./proxy
+          container_name: ems-rest-api-proxy
+          volumes:
+               - ./proxy:/proxy
+               - /proxy/node_modules
+          expose:
+               - 4000
+          ports:
+               - "4000:4000"
           depends_on:
                - rest-api
-          entrypoint: bash -c "sawtooth keygen && tail -f /dev/null "
+
+     shell:
+          image: "hyperledger/sawtooth-shell:chime"
+          container_name: ems-shell
+          depends_on:
+               - rest-api
+          entrypoint: bash -c "sawtooth -v keygen && tail -f /dev/null "

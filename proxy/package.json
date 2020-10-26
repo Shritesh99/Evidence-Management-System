@@ -1,0 +1,15 @@
+{
+	"name": "Evidence-Management-System-Proxy",
+	"version": "1.0.0",
+	"main": "index.js",
+	"repository": "https://github.com/Shritesh99/Evidence-Management-System.git",
+	"scripts": {
+		"start": "node index.js"
+	},
+	"author": "Shritesh99 <shritesh.sj@gmail.com>",
+	"license": "MIT",
+	"dependencies": {
+		"express": "^4.17.1",
+		"http-proxy-middleware": "0.21.0"
+	}
+}
