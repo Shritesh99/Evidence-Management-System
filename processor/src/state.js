@@ -12,7 +12,7 @@ class EMSState {
 	}
 
 	getPerson(signer) {
-		const address = U.getPersonAddress(signer);
+		const address = Utils.getPersonAddress(signer);
 		return this.context
 			.getState([address], this.timeout)
 			.then((entries) => {

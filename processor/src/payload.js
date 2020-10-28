@@ -33,7 +33,7 @@ class EMSPayload {
 			return this.payload.data;
 		else
 			throw new InvalidTransaction(
-				"Action does not match payload data"
+				"Action does not have payload data"
 			);
 	}
 }

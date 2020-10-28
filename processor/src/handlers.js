@@ -27,10 +27,9 @@ class EMSHandler extends TransactionHandler {
 		this.validateTimestamp(payload.getTimestamp());
 
 		if (payload.getAction() === "CREATE_EVIDENCE")
-			this.createEvidence(signer, state, payload);
-		if (payload.getAction() === "CREATE_PERSON")
-			this.createPerson(signer, state, payload);
-
+			return this.createEvidence(signer, state, payload);
+		else if (payload.getAction() === "CREATE_PERSON")
+			return this.createPerson(signer, state, payload);
 		return Promise.resolve().then(() => {
 			throw new InvalidTransaction("Invalid payload");
 		});
@@ -42,7 +41,7 @@ class EMSHandler extends TransactionHandler {
 				throw new InvalidTransaction(
 					`Person with the public key ${signer} does not exists`
 				);
-			return state.createEvidence(signer, person, payload.data);
+			return state.createEvidence(signer, person, payload.getData());
 		});
 	}
 
@@ -52,7 +51,7 @@ class EMSHandler extends TransactionHandler {
 				throw new InvalidTransaction(
 					`Person with the public key ${signer} already exists`
 				);
-			return state.createPerson(signer, payload.data);
+			return state.createPerson(signer, payload.getData());
 		});
 	}
 	validateTimestamp(timestamp) {
