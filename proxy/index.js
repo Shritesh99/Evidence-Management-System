@@ -19,17 +19,12 @@ let allowCrossDomain = function (req, res, next) {
 app.use(allowCrossDomain);
 app.use(
 	"/",
-	proxy(
-		() => {
-			return true;
+	proxy({
+		target: "http://rest-api:8008",
+		changeOrigin: false,
+		onProxyRes: async (proxyRes, req, res) => {
+			proxyRes.statusCode = 200;
 		},
-		{
-			target: "http://rest-api:8008",
-			changeOrigin: false,
-			onProxyRes: async (proxyRes, req, res) => {
-				proxyRes.statusCode = 200;
-			},
-		}
-	)
+	})
 );
 app.listen(4000);

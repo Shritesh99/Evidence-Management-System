@@ -4,10 +4,13 @@ const { TransactionProcessor } = require("sawtooth-sdk/processor");
 
 const EMSHandler = require("./handlers");
 
-const VALIDATOR_URL = "tcp://localhost:4004";
+const VALIDATOR_URL = process.env.VALIDATOR_URL || "tcp://localhost:4004";
 
-const baseApply = EMSHandler.apply;
-EMSHandler.apply = (txn, context) => {
+const tp = new TransactionProcessor(VALIDATOR_URL);
+const handler = new EMSHandler();
+
+const baseApply = handler.apply;
+handler.apply = (txn, context) => {
 	try {
 		return baseApply.call(handler, txn, context);
 	} catch (err) {
@@ -15,7 +18,5 @@ EMSHandler.apply = (txn, context) => {
 	}
 };
 
-// Initialize Transaction Processor
-const tp = new TransactionProcessor(VALIDATOR_URL);
-tp.addHandler(new EMSHandler());
+tp.addHandler(handler);
 tp.start();
