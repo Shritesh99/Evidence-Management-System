@@ -59,30 +59,18 @@ services:
           entrypoint: "sawtooth-rest-api -C tcp://validator:4004 --bind rest-api:8008 -v"
           environment: []
 
-     # rest-api-proxy:
-     #      build: ./proxy
-     #      container_name: ems-rest-api-proxy
-     #      volumes:
-     #           - ./proxy:/proxy
-     #           - /proxy/node_modules
-     #      expose:
-     #           - 4000
-     #      ports:
-     #           - "4000:4000"
-     #      depends_on:
-     #           - rest-api
      rest-api-proxy:
-          image: nginx
+          build: ./proxy
           container_name: ems-rest-api-proxy
           volumes:
-               - ./proxy/nginx.conf:/etc/nginx/nginx.conf:ro
+               - ./proxy:/proxy
+               - /proxy/node_modules
           expose:
                - 4000
           ports:
                - "4000:4000"
           depends_on:
                - rest-api
-          command: [nginx, "-g", "daemon off;"]
 
      shell:
           image: "hyperledger/sawtooth-shell:chime"
