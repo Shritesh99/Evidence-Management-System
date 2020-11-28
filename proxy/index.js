@@ -20,7 +20,7 @@ app.use(allowCrossDomain);
 app.use(
 	"/",
 	proxy({
-		target: "http://rest-api:8008",
+		target: "http://rest-api-0:8008",
 		changeOrigin: false,
 		onProxyRes: async (proxyRes, req, res) => {
 			proxyRes.statusCode = 200;

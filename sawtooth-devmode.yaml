@@ -1,4 +1,4 @@
-version: "2.1"
+version: "3.7"
 services:
      settings-tp:
           image: "hyperledger/sawtooth-settings-tp:chime"
@@ -22,6 +22,8 @@ services:
      validator:
           image: "hyperledger/sawtooth-validator:chime"
           container_name: ems-validator
+          volumes:
+               - ./metrices/validator.toml:/etc/sawtooth/validator.toml
           expose:
                - 4004
           ports:
@@ -52,8 +54,8 @@ services:
      rest-api:
           image: "hyperledger/sawtooth-rest-api:chime"
           container_name: ems-rest-api
-          ports:
-               - "8008:8008"
+          volumes:
+               - ./metrices/rest_api.toml:/etc/sawtooth/rest_api.toml
           depends_on:
                - validator
           entrypoint: "sawtooth-rest-api -C tcp://validator:4004 --bind rest-api:8008 -v"
